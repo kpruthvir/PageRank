@@ -6,7 +6,7 @@ object PageRank {
   def main(args: Array[String]) {
 
     val spark_conf = new SparkConf()
-      .setAppName("PageRank").setMaster("local[1]")
+      .setAppName("PageRank")//.setMaster("local[1]")     // to run locally uncomment setMaster
 
     // create sparkSession with spark-conf
     val spark = SparkSession
@@ -121,7 +121,7 @@ class PageRank extends scala.Serializable{
   }
 
   // print rdd
-  def p(rdd: org.apache.spark.rdd.RDD[_]) = rdd.collect.foreach(println)
+  def p(rdd: org.apache.spark.rdd.RDD[_]): Unit = rdd.collect.foreach(println)
 
   /*
     https://lintool.github.io/MapReduceAlgorithms/MapReduce-book-final.pdf
