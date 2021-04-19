@@ -1,14 +1,13 @@
 import org.apache.spark.SparkConf
 import org.apache.spark.mllib.evaluation.MulticlassMetrics
 import org.apache.spark.sql.{DataFrame, Row, SaveMode, SparkSession}
-import org.apache.spark.sql.functions.col
 
 case class Metric(metricName: String, value: Double)
 
 object Tweets {
   def main(args: Array[String]) {
     val spark_conf = new SparkConf()
-      .setAppName("Tweets")//.setMaster("local[1]")
+      .setAppName("Tweets")//.setMaster("local[1]") // to run locally uncomment setMaster
     val spark = SparkSession
       .builder()
       .config(spark_conf)
@@ -38,19 +37,19 @@ object Tweets {
 
     // COMMAND ----------
 
-    // 3) Build transformers, annotators, estimators, and run them thorugh a pipeline
-    import org.apache.spark.ml.feature.{Tokenizer, StopWordsRemover, HashingTF, StringIndexer}
+    // 3) Build transformers, annotators, estimators, and run them through a pipeline
+    import org.apache.spark.ml.Pipeline
     import org.apache.spark.ml.classification.LogisticRegression
-    import org.apache.spark.ml.{Pipeline, PipelineModel}
+    import org.apache.spark.ml.evaluation.MulticlassClassificationEvaluator
+    import org.apache.spark.ml.feature.{HashingTF, StopWordsRemover, StringIndexer, Tokenizer}
     import org.apache.spark.ml.tuning.{CrossValidator, ParamGridBuilder}
-    import org.apache.spark.ml.evaluation.{RegressionEvaluator, MulticlassClassificationEvaluator}
 
     val tokenizer = new Tokenizer()
       .setInputCol("text")
       .setOutputCol("words")
     val filtered_words = new StopWordsRemover()
       .setInputCol(tokenizer.getOutputCol)
-      .setOutputCol(("filtered_no_stop_words"))
+      .setOutputCol("filtered_no_stop_words")
     val hashing_tf = new HashingTF()
       .setNumFeatures(500)
       .setInputCol(filtered_words.getOutputCol)
@@ -124,7 +123,7 @@ object Tweets {
 
     // Weighted stats
     val metric1_result = new Metric("Weighted precision:", metrics.weightedPrecision)
-    val metric2_result = new Metric("Weighted recall:" , metrics.weightedRecall)
+    val metric2_result = new Metric("Weighted recall:", metrics.weightedRecall)
     val metric3_result = new Metric("Weighted F1 score:", metrics.weightedFMeasure)
     val metric4_result = new Metric("Weighted false positive rate:", metrics.weightedFalsePositiveRate)
     val metric5_result = new Metric("Weighted false positive rate:", metrics.weightedTruePositiveRate)
